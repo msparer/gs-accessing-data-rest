@@ -74,7 +74,8 @@ public class ApplicationTests {
 		String location = mvcResult.getResponse().getHeader("Location");
 		mockMvc.perform(get(location)).andExpect(status().isOk()).andExpect(
 				jsonPath("$.firstName").value("Frodo")).andExpect(
-						jsonPath("$.lastName").value("Baggins"));
+						jsonPath("$.lastName").value("Baggins")).andExpect(
+								jsonPath("$.place").value(EventHandler.PLACE));
 	}
 
 	@Test
@@ -100,13 +101,16 @@ public class ApplicationTests {
 
 		String location = mvcResult.getResponse().getHeader("Location");
 
+		// trying to update read-only place
 		mockMvc.perform(put(location).content(
-				"{\"firstName\": \"Bilbo\", \"lastName\":\"Baggins\"}")).andExpect(
+				"{\"firstName\": \"Bilbo\", \"lastName\":\"Baggins\", \"place\":\"Mordor\"}")).andExpect(
 						status().isNoContent());
 
 		mockMvc.perform(get(location)).andExpect(status().isOk()).andExpect(
 				jsonPath("$.firstName").value("Bilbo")).andExpect(
-						jsonPath("$.lastName").value("Baggins"));
+						jsonPath("$.lastName").value("Baggins")).andExpect(
+								// it's still the old place
+								jsonPath("$.place").value(EventHandler.PLACE));
 	}
 
 	@Test
@@ -118,14 +122,18 @@ public class ApplicationTests {
 
 		String location = mvcResult.getResponse().getHeader("Location");
 
+		// trying to update read-only place
 		mockMvc.perform(
-				patch(location).content("{\"firstName\": \"Bilbo Jr.\"}")).andExpect(
+				patch(location).content("{\"firstName\": \"Bilbo Jr.\", \"place\":\"Mordor\"}")).andExpect(
 						status().isNoContent());
 
 		mockMvc.perform(get(location)).andExpect(status().isOk()).andExpect(
 				jsonPath("$.firstName").value("Bilbo Jr.")).andExpect(
-						jsonPath("$.lastName").value("Baggins"));
+						jsonPath("$.lastName").value("Baggins")).andExpect(
+								// it's still the old place
+								jsonPath("$.place").value(EventHandler.PLACE));
 	}
+	
 
 	@Test
 	public void shouldDeleteEntity() throws Exception {
